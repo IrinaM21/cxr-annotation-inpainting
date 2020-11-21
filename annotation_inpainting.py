@@ -378,27 +378,30 @@ model.compile(optimizer='adam', loss='mean_absolute_error', metrics=[dice_coef])
 
 # training the model
 _ = model.fit_generator(traingen, validation_data=testgen, 
-          epochs=2, 
+          epochs=1, 
           steps_per_epoch=len(traingen), 
           validation_steps=len(testgen),
           use_multiprocessing=True
           )
 
+# saving the model for later use
+model.save('inpainting_model.h5')
+
 # Legend: Original Image | Mask generated | Inpainted Image | Ground Truth
 
 # Examples
-rows = 32
-sample_idx = 54
-[masked_images, masks], sample_labels = testgen[sample_idx]
+# rows = 20
+# sample_idx = 54
+# [masked_images, masks], sample_labels = testgen[sample_idx]
 
-fig, axs = plt.subplots(nrows=rows, ncols=4, figsize=(8, 2*rows))
+# fig, axs = plt.subplots(nrows=rows, ncols=4, figsize=(8, 2*rows))
 
-for i in range(32):
-  inputs = [masked_images[i].reshape((1,)+masked_images[i].shape), masks[i].reshape((1,)+masks[i].shape)]
-  impainted_image = model.predict(inputs)
-  axs[i][0].imshow(masked_images[i])
-  axs[i][1].imshow(masks[i])
-  axs[i][2].imshow(impainted_image.reshape(impainted_image.shape[1:]))
-  axs[i][3].imshow(sample_labels[i])
+# for i in range(20):
+  # inputs = [masked_images[i].reshape((1,)+masked_images[i].shape), masks[i].reshape((1,)+masks[i].shape)]
+  # impainted_image = model.predict(inputs)
+  # axs[i][0].imshow(masked_images[i])
+  # axs[i][1].imshow(masks[i])
+  # axs[i][2].imshow(impainted_image.reshape(impainted_image.shape[1:]))
+  # axs[i][3].imshow(sample_labels[i])
   
-plt.show()
+# plt.show()
