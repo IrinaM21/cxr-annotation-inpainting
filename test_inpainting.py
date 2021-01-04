@@ -1,8 +1,5 @@
 # tests the inpainting model by running the model on an image 
 # and creating the masked version of the image
-# TODO: reorganize code from this file and annotation_inpainting.py
-
-# preprocess data (again)
 
 import keras
 import tensorflow as tf
@@ -95,7 +92,6 @@ PATH = '/data/jedrzej/medical/covid_dataset/'
 # get all of the training CXRs and labels
 train = tf.keras.preprocessing.image_dataset_from_directory(
     PATH,
-    # consider changing back to rgb for annotation inpainting
     color_mode = 'rgb',
     validation_split=0.2,
     subset="training",
@@ -153,7 +149,6 @@ traingen = createAugment(x_train, x_train)
 # get all of the validation images and labels
 test = tf.keras.preprocessing.image_dataset_from_directory(
     PATH,
-    # consider changing back to rgb for annotation inpainting
     color_mode = 'rgb',
     validation_split=0.2,
     subset="validation",
