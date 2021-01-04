@@ -1,4 +1,3 @@
-
 # prepares image data and random masks and trains the inpainting model
 # !git clone https://github.com/ayulockin/deepimageinpainting.git
 
@@ -22,6 +21,7 @@ import tensorflow as tf
 ## PREPROCESSING ##
 ###################
 
+## Ref: https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly.
 class createAugment(keras.utils.Sequence):
   # Generates masked_image, masks, and target images for training
   def __init__(self, X, y, batch_size=20, dim=(224, 224), n_channels=3, shuffle=True):
@@ -96,7 +96,7 @@ class createAugment(keras.utils.Sequence):
     masked_image = masked_image.astype(int)
 
     print(masked_image)
-    print(mask)
+    # print(mask)
 
     return masked_image, mask
 
