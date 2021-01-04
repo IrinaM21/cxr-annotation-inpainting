@@ -67,9 +67,9 @@ class createAugment(keras.utils.Sequence):
       ## Get mask associated to that image
       masked_image, mask = self.__createMask(image_copy)
       
-      Masked_images[i,] = masked_image
-      Mask_batch[i,] = mask
-      y_batch[i] = self.y[idx]
+      Masked_images[i,] = masked_image / 255
+      Mask_batch[i,] = mask / 255
+      y_batch[i] = self.y[idx] / 255
 
     ## Return mask as well because partial convolution require the same.
     return [Masked_images, Mask_batch], y_batch
@@ -89,7 +89,14 @@ class createAugment(keras.utils.Sequence):
 
     ## Mask the image
     masked_image = img.copy()
+
     masked_image[mask==0] = 255
+
+    # masked_image = masked_image  * 255
+    masked_image = masked_image.astype(int)
+
+    print(masked_image)
+    print(mask)
 
     return masked_image, mask
 
@@ -98,6 +105,7 @@ PATH = '/data/jedrzej/medical/covid_dataset/'
 # get all of the training CXRs and labels
 train = tf.keras.preprocessing.image_dataset_from_directory(
     PATH,
+    color_mode = 'rgb',
     validation_split=0.2,
     subset="training",
     seed=123,
@@ -115,6 +123,7 @@ traingen = createAugment(x_train, x_train)
 # get all of the validation images and labels
 test = tf.keras.preprocessing.image_dataset_from_directory(
    PATH,
+   color_mode = 'rgb',
    validation_split=0.2,
    subset="validation",
    seed=123,
@@ -385,7 +394,8 @@ _ = model.fit_generator(traingen, validation_data=testgen,
           )
 
 # saving the model for later use
-model.save('inpainting_model.h5')
+model.save('inpainting_model_test.h5')
+
 
 # Legend: Original Image | Mask generated | Inpainted Image | Ground Truth
 
