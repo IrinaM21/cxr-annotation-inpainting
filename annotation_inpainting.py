@@ -16,6 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from copy import deepcopy
 import tensorflow as tf
+import random
 
 ###################
 ## PREPROCESSING ##
@@ -67,16 +68,20 @@ class createAugment(keras.utils.Sequence):
       ## Get mask associated to that image
       masked_image, mask = self.__createMask(image_copy)
       
-      Masked_images[i,] = masked_image / 255
-      Mask_batch[i,] = mask / 255
-      y_batch[i] = self.y[idx] / 255
+      # Masked_images[i,] = masked_image / 255
+      # Mask_batch[i,] = mask / 255
+      # y_batch[i] = self.y[idx] / 255
+
+      Masked_images[i,] = masked_image
+      Mask_batch[i,] = mask
+      y_batch[i] = self.y[idx]
 
     ## Return mask as well because partial convolution require the same.
     return [Masked_images, Mask_batch], y_batch
 
   def __createMask(self, img):
     ## Prepare masking matrix
-    mask = np.full((224,224,3), 255, np.uint8) ## White background
+    mask = np.full((224,224,3), 255, np.float32) ## White background
     for _ in range(np.random.randint(1, 10)):
       # Get random x locations to start line
       x1, x2 = np.random.randint(1, 224), np.random.randint(1, 224)
@@ -92,11 +97,7 @@ class createAugment(keras.utils.Sequence):
 
     masked_image[mask==0] = 255
 
-    # masked_image = masked_image  * 255
-    masked_image = masked_image.astype(int)
-
     print(masked_image)
-    # print(mask)
 
     return masked_image, mask
 
@@ -394,7 +395,7 @@ _ = model.fit_generator(traingen, validation_data=testgen,
           )
 
 # saving the model for later use
-model.save('inpainting_model_test.h5')
+model.save('inpainting_model_1421.h5')
 
 
 # Legend: Original Image | Mask generated | Inpainted Image | Ground Truth
