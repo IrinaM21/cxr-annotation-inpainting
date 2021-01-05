@@ -61,16 +61,20 @@ class createAugment(keras.utils.Sequence):
       ## Get mask associated to that image
       masked_image, mask = self.__createMask(image_copy)
       
-      Masked_images[i,] = masked_image / 255	
-      Mask_batch[i,] = mask / 255	
-      y_batch[i] = self.y[idx] / 255
+      # Masked_images[i,] = masked_image / 255
+      # Mask_batch[i,] = mask / 255
+      # y_batch[i] = self.y[idx] / 255
+
+      Masked_images[i,] = masked_image
+      Mask_batch[i,] = mask
+      y_batch[i] = self.y[idx]
 
     ## Return mask as well because partial convolution require the same.
     return [Masked_images, Mask_batch], y_batch
 
   def __createMask(self, img):
     ## Prepare masking matrix
-    mask = np.full((224,224,3), 255, np.uint8) ## White background
+    mask = np.full((224,224,3), 255, np.float32) ## White background
     for _ in range(np.random.randint(1, 10)):
       # Get random x locations to start line
       x1, x2 = np.random.randint(1, 224), np.random.randint(1, 224)
@@ -83,7 +87,10 @@ class createAugment(keras.utils.Sequence):
 
     ## Mask the image
     masked_image = img.copy()
+
     masked_image[mask==0] = 255
+
+    # print(masked_image)
 
     return masked_image, mask
 
@@ -388,18 +395,18 @@ def conv_output_length(input_length, filter_size,
 
 # load model from weights and architecture files
 model = InpaintingModel().prepare_model()
-model.load_weights('./inpainting_model_3.h5')
+model.load_weights('./inpainting_model_1421.h5')
 
 # test model on a file and create a file with output
 rows = 20
 sample_idx = 54
 [masked_images, masks], sample_labels = traingen[sample_idx]
 # casting everything to an int so the values aren't clipped to 0...1 later
-masked_images = masked_images * 255
-masked_images = masked_images.astype(int)
+# masked_images = masked_images * 255
+# masked_images = masked_images.astype(int)
 # this might be unn (see CreateAugment function)
 # masks = masks.astype(int)
-print(masked_images)
+# print(masked_images)
 
 fig, axs = plt.subplots(nrows=rows, ncols=4, figsize=(8, 2*rows))
 
@@ -409,8 +416,8 @@ for i in range(20):
   inputs = [masked_images[i].reshape((1,)+masked_images[i].shape), masks[i].reshape((1,)+masks[i].shape)]
   # inputs = [masked_images[i], masks[i]]
   impainted_image = model.predict(inputs)
-  axs[i][0].imshow(masked_images[i])
-  axs[i][1].imshow(masks[i])
+  axs[i][0].imshow(masked_images[i].astype(int))
+  axs[i][1].imshow(masks[i].astype(int))
   axs[i][2].imshow(impainted_image.reshape(impainted_image.shape[1:]))
   axs[i][3].imshow(sample_labels[i])
 
