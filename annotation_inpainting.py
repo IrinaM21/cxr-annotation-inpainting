@@ -97,7 +97,7 @@ class createAugment(keras.utils.Sequence):
 
     masked_image[mask==0] = 255
 
-    print(masked_image)
+    # print(masked_image)
 
     return masked_image, mask
 
@@ -120,6 +120,8 @@ y_train = np.concatenate([y for x, y in train], axis=0)
 
 # create masks for each CXR to be  used in training the inpainting model
 traingen = createAugment(x_train, x_train)
+
+print(traingen.X[23])
 
 # get all of the validation images and labels
 test = tf.keras.preprocessing.image_dataset_from_directory(
