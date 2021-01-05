@@ -1,1 +1,1 @@
-# ChestXRayVis
+# cxr-annotation-inpainting
