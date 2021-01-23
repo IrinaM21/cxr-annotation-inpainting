@@ -1,22 +1,13 @@
+# version: 1.22.21
+
 # prepares image data and random masks and trains the inpainting model
 # !git clone https://github.com/ayulockin/deepimageinpainting.git
 
 # keras must be installed
-# opencv must be installed
 
-import torch
 import keras
-import torchvision
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.utils.data import TensorDataset, DataLoader
-import torchvision.transforms as transforms
-from torchvision import datasets, models
 import numpy as np
-import matplotlib.pyplot as plt
-from copy import deepcopy
 import tensorflow as tf
-import random
 
 ###################
 ## PREPROCESSING ##
@@ -25,7 +16,7 @@ import random
 ## Ref: https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly.
 class createAugment(keras.utils.Sequence):
   # Generates masked_image, masks, and target images for training
-  def __init__(self, X, y, batch_size=20, dim=(224, 224), n_channels=3, shuffle=True):
+  def __init__(self, X, y, batch_size=10, dim=(224, 224), n_channels=3, shuffle=True):
       # Initialize the constructor
       self.batch_size = batch_size
       self.X = X
@@ -68,20 +59,21 @@ class createAugment(keras.utils.Sequence):
       ## Get mask associated to that image
       masked_image, mask = self.__createMask(image_copy)
       
-      # Masked_images[i,] = masked_image / 255
-      # Mask_batch[i,] = mask / 255
-      # y_batch[i] = self.y[idx] / 255
+      # normalizing values to converge faster
+      Masked_images[i,] = masked_image / 255
+      Mask_batch[i,] = mask / 255
+      y_batch[i] = self.y[idx] / 255
 
-      Masked_images[i,] = masked_image
-      Mask_batch[i,] = mask
-      y_batch[i] = self.y[idx]
+      # Masked_images[i,] = masked_image
+      # Mask_batch[i,] = mask
+      # y_batch[i] = self.y[idx]
 
     ## Return mask as well because partial convolution require the same.
     return [Masked_images, Mask_batch], y_batch
 
   def __createMask(self, img):
     ## Prepare masking matrix
-    mask = np.full((224,224,3), 255, np.float32) ## White background
+    mask = np.full((224,224,3), 1, np.float32) ## White background
     for _ in range(np.random.randint(1, 10)):
       # Get random x locations to start line
       x1, x2 = np.random.randint(1, 224), np.random.randint(1, 224)
@@ -95,14 +87,15 @@ class createAugment(keras.utils.Sequence):
     ## Mask the image
     masked_image = img.copy()
 
-    masked_image[mask==0] = 255
+    masked_image[mask==0] = 1
 
     # print(masked_image)
 
     return masked_image, mask
 
-PATH = '/data/jedrzej/medical/covid_dataset/'
+PATH = '/content/drive/My Drive/ResearchProject/3_class_data'
 
+print('getting training data')
 # get all of the training CXRs and labels
 train = tf.keras.preprocessing.image_dataset_from_directory(
     PATH,
@@ -111,9 +104,9 @@ train = tf.keras.preprocessing.image_dataset_from_directory(
     subset="training",
     seed=123,
     image_size=(224, 224),
-    batch_size=20)
+    batch_size=10)
 
-# extracts training CXRs
+print('extracting training CXRs')
 x_train = np.concatenate([x for x, y in train], axis=0)
 # extracts training labels
 y_train = np.concatenate([y for x, y in train], axis=0)
@@ -121,8 +114,8 @@ y_train = np.concatenate([y for x, y in train], axis=0)
 # create masks for each CXR to be  used in training the inpainting model
 traingen = createAugment(x_train, x_train)
 
-print(traingen.X[23])
-
+# print(traingen.X[23])
+print('getting testing data')
 # get all of the validation images and labels
 test = tf.keras.preprocessing.image_dataset_from_directory(
    PATH,
@@ -131,8 +124,9 @@ test = tf.keras.preprocessing.image_dataset_from_directory(
    subset="validation",
    seed=123,
    image_size=(224, 224),
-   batch_size=20)
+   batch_size=10)
 
+print('extracting testing CXRs')
 # extracts validation CXRs
 x_test = np.concatenate([x for x, y in test], axis=0)
 # extracts validation labels
@@ -374,30 +368,25 @@ def conv_output_length(input_length, filter_size,
 ##############
 
 # creating the model
-import os
 import cv2
 import numpy as np
-
-import matplotlib.pyplot as plt
-
-from mpl_toolkits.axes_grid1 import ImageGrid
-
 model = InpaintingModel().prepare_model()
+print("model prepared")
 model.compile(optimizer='adam', loss='mean_absolute_error', metrics=[dice_coef])
-
+print("model compiled")
 # plots the model. requires sudo to be installed in server
-#keras.utils.plot_model(model, show_shapes=True, dpi=60, to_file='model_v2.png')
+# keras.utils.plot_model(model, show_shapes=True, dpi=60, to_file='model_v2.png')
 
 # training the model
 _ = model.fit_generator(traingen, validation_data=testgen, 
-          epochs=1, 
+          epochs=10, 
           steps_per_epoch=len(traingen), 
           validation_steps=len(testgen),
           use_multiprocessing=True
           )
 
 # saving the model for later use
-model.save('inpainting_model_1421.h5')
+model.save('/content/drive/My Drive/ResearchProject/final_models/inpainting_model_12221.h5')
 
 
 # Legend: Original Image | Mask generated | Inpainted Image | Ground Truth
