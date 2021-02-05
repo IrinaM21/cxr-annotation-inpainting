@@ -1,5 +1,3 @@
-# version: 1.22.21
-
 # prepares image data and random masks and trains the inpainting model
 # !git clone https://github.com/ayulockin/deepimageinpainting.git
 
@@ -377,33 +375,27 @@ print("model compiled")
 # plots the model. requires sudo to be installed in server
 # keras.utils.plot_model(model, show_shapes=True, dpi=60, to_file='model_v2.png')
 
+checkpoint_path = "/content/drive/My Drive/ResearchProject/checkpoints/cp.ckpt"
+cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+                                                 save_weights_only=True,
+                                                 verbose=1)
+
+model.load_weights(checkpoint_path)
+
+
+checkpoint_path = "/content/drive/My Drive/ResearchProject/checkpoints/cp12321-{epoch:04d}.ckpt"
+
+
+
 # training the model
 _ = model.fit_generator(traingen, validation_data=testgen, 
-          epochs=10, 
+          epochs=5, 
           steps_per_epoch=len(traingen), 
           validation_steps=len(testgen),
+          callbacks=[cp_callback],
           use_multiprocessing=True
           )
 
 # saving the model for later use
-model.save('/content/drive/My Drive/ResearchProject/final_models/inpainting_model_12221.h5')
+model.save('/content/drive/My Drive/ResearchProject/final_models/inpainting_model_12321.h5')
 
-
-# Legend: Original Image | Mask generated | Inpainted Image | Ground Truth
-
-# Examples
-# rows = 20
-# sample_idx = 54
-# [masked_images, masks], sample_labels = testgen[sample_idx]
-
-# fig, axs = plt.subplots(nrows=rows, ncols=4, figsize=(8, 2*rows))
-
-# for i in range(20):
-  # inputs = [masked_images[i].reshape((1,)+masked_images[i].shape), masks[i].reshape((1,)+masks[i].shape)]
-  # impainted_image = model.predict(inputs)
-  # axs[i][0].imshow(masked_images[i])
-  # axs[i][1].imshow(masks[i])
-  # axs[i][2].imshow(impainted_image.reshape(impainted_image.shape[1:]))
-  # axs[i][3].imshow(sample_labels[i])
-  
-# plt.show()
