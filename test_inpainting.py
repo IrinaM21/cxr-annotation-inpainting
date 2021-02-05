@@ -1,14 +1,9 @@
-# tests the inpainting model by running the model on an image 
-# and creating the masked version of the image
-
 import keras
-import tensorflow as tf
-import os
-import cv2
 import numpy as np
-
-import matplotlib.pyplot as plt
-
+import tensorflow as tf
+import cv2
+import os
+import  matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import ImageGrid
 
 ###################
@@ -18,7 +13,7 @@ from mpl_toolkits.axes_grid1 import ImageGrid
 ## Ref: https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly.
 class createAugment(keras.utils.Sequence):
   # Generates masked_image, masks, and target images for training
-  def __init__(self, X, y, batch_size=20, dim=(224, 224), n_channels=3, shuffle=True):
+  def __init__(self, X, y, batch_size=10, dim=(224, 224), n_channels=3, shuffle=True):
       # Initialize the constructor
       self.batch_size = batch_size
       self.X = X
@@ -61,13 +56,14 @@ class createAugment(keras.utils.Sequence):
       ## Get mask associated to that image
       masked_image, mask = self.__createMask(image_copy)
       
-      # Masked_images[i,] = masked_image / 255
-      # Mask_batch[i,] = mask / 255
-      # y_batch[i] = self.y[idx] / 255
+      # normalizing values to converge faster
+      Masked_images[i,] = masked_image / 255
+      Mask_batch[i,] = mask / 255
+      y_batch[i] = self.y[idx] / 255
 
-      Masked_images[i,] = masked_image
-      Mask_batch[i,] = mask
-      y_batch[i] = self.y[idx]
+      # Masked_images[i,] = masked_image
+      # Mask_batch[i,] = mask
+      # y_batch[i] = self.y[idx]
 
     ## Return mask as well because partial convolution require the same.
     return [Masked_images, Mask_batch], y_batch
@@ -104,56 +100,16 @@ train = tf.keras.preprocessing.image_dataset_from_directory(
     subset="training",
     seed=123,
     image_size=(224, 224),
-    batch_size=20)
+    batch_size=10)
 
 # extracts training CXRs
 x_train = np.concatenate([x for x, y in train], axis=0)
 # extracts training labels
 y_train = np.concatenate([y for x, y in train], axis=0)
 
-## Get first 32 images as samples
-# sample_images = x_train[:32]
-# sample_labels = y_train[:32]
-
-#fig = plt.figure(figsize=(16., 8.))
-#grid = ImageGrid(fig, 111,
-                 #nrows_ncols=(4, 8),  # creates 2x2 grid of axes
-                 #axes_pad=0.3,  # pad between axes in inch.
-                 #)
-
-#for ax, image, label in zip(grid, sample_images, sample_labels):
-  # print(image)
-  # ax.imshow(image)
-
-# Generating a random number each time this file is created
-# import random
-# rand_num = random.randint(0, 1000)
-# PATH = '/home/dirm/inpainting/test' + str(rand_num) + '.png'
-# plt.savefig(PATH)
-# plt.show()
-# plt.close()
-
 # create masks for each CXR to be  used in training the inpainting model
 traingen = createAugment(x_train, x_train)
-#sample_idx = 1
-#[masked_images, masks], sample_labels = traingen[sample_idx]
 
-#fig, axs = plt.subplots(nrows=20, ncols=4, figsize=(8, 2*20))
-
-#for i in range(20):
-#    axs[i][0].imshow(masked_images[i])
-#    axs[i][1].imshow(masks[i])
-#    axs[i][3].imshow(sample_labels[i])
-
-# Generating a random number each time this file is created
-# import random
-# rand_num = random.randint(0, 1000)
-# PATH = '/home/dirm/inpainting/t' + str(rand_num) + '.png'
-# plt.savefig(PATH)
-# plt.show()
-# plt.close()
-
-# get all of the validation images and labels
 test = tf.keras.preprocessing.image_dataset_from_directory(
     PATH,
     color_mode = 'rgb',
@@ -161,7 +117,7 @@ test = tf.keras.preprocessing.image_dataset_from_directory(
     subset="validation",
     seed=123,
     image_size=(224, 224),
-    batch_size=20)
+    batch_size=10)
 
 # extracts validation CXRs
 x_test = np.concatenate([x for x, y in test], axis=0)
@@ -395,7 +351,7 @@ def conv_output_length(input_length, filter_size,
 
 # load model from weights and architecture files
 model = InpaintingModel().prepare_model()
-model.load_weights('./inpainting_model_1421.h5')
+model.load_weights('./inpainting_model_12321.h5')
 
 # test model on a file and create a file with output
 rows = 20
@@ -404,7 +360,6 @@ sample_idx = 54
 # casting everything to an int so the values aren't clipped to 0...1 later
 # masked_images = masked_images * 255
 # masked_images = masked_images.astype(int)
-# this might be unn (see CreateAugment function)
 # masks = masks.astype(int)
 # print(masked_images)
 
@@ -412,13 +367,13 @@ fig, axs = plt.subplots(nrows=rows, ncols=4, figsize=(8, 2*rows))
 
 # Legend: Original Image | Mask generated | Inpainted Image | Ground Truth
 
-for i in range(20):
+for i in range(10):
   inputs = [masked_images[i].reshape((1,)+masked_images[i].shape), masks[i].reshape((1,)+masks[i].shape)]
-  # inputs = [masked_images[i], masks[i]]
   impainted_image = model.predict(inputs)
-  axs[i][0].imshow(masked_images[i].astype(int))
-  axs[i][1].imshow(masks[i].astype(int))
+  axs[i][0].imshow(masked_images[i])
+  axs[i][1].imshow(masks[i])
   axs[i][2].imshow(impainted_image.reshape(impainted_image.shape[1:]))
+  # not casting to int anymore because the images are normalized now
   axs[i][3].imshow(sample_labels[i])
 
 # Generating a random number each time this file is created
