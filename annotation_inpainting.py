@@ -62,10 +62,6 @@ class createAugment(keras.utils.Sequence):
       Mask_batch[i,] = mask / 255
       y_batch[i] = self.y[idx] / 255
 
-      # Masked_images[i,] = masked_image
-      # Mask_batch[i,] = mask
-      # y_batch[i] = self.y[idx]
-
     ## Return mask as well because partial convolution require the same.
     return [Masked_images, Mask_batch], y_batch
 
@@ -91,7 +87,7 @@ class createAugment(keras.utils.Sequence):
 
     return masked_image, mask
 
-PATH = '/content/drive/My Drive/ResearchProject/3_class_data'
+PATH = './3_class_data'
 
 print('getting training data')
 # get all of the training CXRs and labels
@@ -112,7 +108,6 @@ y_train = np.concatenate([y for x, y in train], axis=0)
 # create masks for each CXR to be  used in training the inpainting model
 traingen = createAugment(x_train, x_train)
 
-# print(traingen.X[23])
 print('getting testing data')
 # get all of the validation images and labels
 test = tf.keras.preprocessing.image_dataset_from_directory(
@@ -144,6 +139,7 @@ def dice_coef(y_true, y_pred):
 ## MODEL ##
 ###########
 
+# Ref: https://github.com/ayulockin/deepimageinpainting/blob/master/Image_Inpainting_Partial_Convolution.ipynb
 class InpaintingModel:
   '''
   Build UNET like model for image inpainting task.
@@ -372,10 +368,8 @@ model = InpaintingModel().prepare_model()
 print("model prepared")
 model.compile(optimizer='adam', loss='mean_absolute_error', metrics=[dice_coef])
 print("model compiled")
-# plots the model. requires sudo to be installed in server
-# keras.utils.plot_model(model, show_shapes=True, dpi=60, to_file='model_v2.png')
 
-checkpoint_path = "/content/drive/My Drive/ResearchProject/checkpoints/cp.ckpt"
+checkpoint_path = "./checkpoints/cp12321-{epoch:04d}.ckpt"
 cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
                                                  save_weights_only=True,
                                                  verbose=1)
@@ -383,7 +377,7 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
 model.load_weights(checkpoint_path)
 
 
-checkpoint_path = "/content/drive/My Drive/ResearchProject/checkpoints/cp12321-{epoch:04d}.ckpt"
+
 
 
 
@@ -397,5 +391,5 @@ _ = model.fit_generator(traingen, validation_data=testgen,
           )
 
 # saving the model for later use
-model.save('/content/drive/My Drive/ResearchProject/final_models/inpainting_model_12321.h5')
+model.save('./models/inpainting_model.h5')
 
