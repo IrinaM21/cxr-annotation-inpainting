@@ -35,7 +35,7 @@ test_transform = transforms.Compose([
 print('defined transforms')
 
 # define datasets:
-data = datasets.ImageFolder('./data')
+data = datasets.ImageFolder('./3_class_data')
 
 print('found data')
 
