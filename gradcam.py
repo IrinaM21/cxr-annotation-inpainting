@@ -86,7 +86,7 @@ def show_cam_on_image(img, mask):
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%Y-%H:%M:%S")
 
-    cv2.imwrite('/home/dirm/original-model/output/cam-' + dt_string + '-.png', np.uint8(255 * cam))
+    cv2.imwrite('./output/cam-' + dt_string + '-.png', np.uint8(255 * cam))
 
 
 class GradCam:
@@ -199,22 +199,6 @@ class GuidedBackpropReLUModel:
 
         return output
 
-'''
-def get_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--use-cuda', action='store_true', default=False,
-                        help='Use NVIDIA GPU acceleration')
-    parser.add_argument('--image-path', type=str, default='./examples/both.png',
-                        help='Input image path')
-    args = parser.parse_args()
-    args.use_cuda = args.use_cuda and torch.cuda.is_available()
-    if args.use_cuda:
-        print("Using GPU for acceleration")
-    else:
-        print("Using CPU for computation")
-
-    return args
-'''
 def deprocess_image(img):
     """ see https://github.com/jacobgil/keras-grad-cam/blob/master/grad-cam.py#L65 """
     img = img - np.mean(img)
@@ -246,7 +230,7 @@ if __name__ == '__main__':
 
     grad_cam = GradCam(model=model, feature_module=model.layer4, target_layer_names=["1"])
 
-    TEST_IMG_PATH = '/data/jedrzej/medical/covid_dataset/covid/1-s2.0-S1341321X20301124-gr3_lrg-c.png'
+    TEST_IMG_PATH = 'IMAGE PATH'
 
     img = cv2.imread(TEST_IMG_PATH, 1)
     img = np.float32(cv2.resize(img, (224, 224))) / 255
@@ -270,7 +254,7 @@ if __name__ == '__main__':
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%Y-%H:%M:%S")
 
-    cv2.imwrite('/home/dirm/original-model/output/gb-' + dt_string + '-.png', gb)
-    cv2.imwrite('/home/dirm/original-model/output/cam_gb-' + dt_string + '-.png', cam_gb)
+    cv2.imwrite('./output/gb-' + dt_string + '-.png', gb)
+    cv2.imwrite('./output/cam_gb-' + dt_string + '-.png', cam_gb)
 
     
