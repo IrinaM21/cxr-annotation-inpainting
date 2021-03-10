@@ -1,5 +1,5 @@
 # using custom mask shapes and model trained in 
-# annotation_inpainting.py to inpaint annotations
+# cxr_inpainting.py to inpaint annotations
 
 import torch
 import keras
@@ -352,7 +352,7 @@ def conv_output_length(input_length, filter_size,
 
 # load model from weights and architecture files
 model = InpaintingModel().prepare_model()
-model.load_weights('./inpainting_model.h5')
+model.load_weights('./models/inpainting_model.h5')
 
 # test model on a file and create a file with output
 rows = 10
