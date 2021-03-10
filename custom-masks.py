@@ -1,10 +1,19 @@
+# using custom mask shapes and model trained in 
+# annotation_inpainting.py to inpaint annotations
+
+import torch
 import keras
-import numpy as np
 import tensorflow as tf
-import cv2
-import os
-import  matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1 import ImageGrid
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.utils.data import Dataset, TensorDataset, DataLoader
+import torchvision.transforms as transforms
+from torchvision import datasets, models
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+from datetime import datetime
+from PIL import Image, ImageOps
 
 ###################
 ## PREPROCESSING ##
@@ -61,51 +70,68 @@ class createAugment(keras.utils.Sequence):
       Mask_batch[i,] = mask / 255
       y_batch[i] = self.y[idx] / 255
 
-      # Masked_images[i,] = masked_image
-      # Mask_batch[i,] = mask
-      # y_batch[i] = self.y[idx]
-
     ## Return mask as well because partial convolution require the same.
     return [Masked_images, Mask_batch], y_batch
+  
+  # added detect color method to mask annotations in color
+  def detectColor(img):
+    hsv_im = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+    has_color = False
+    mask = np.full((224,224,3), 255, np.float32)
 
+    for x in range(hsv_im.shape[0]):
+      for y in range(hsv_im.shape[1]):
+        if hsv_im[x][y][1] > 0.5:
+          mask[x][y] = [0,0,0]
+          has_color = True
+
+    if has_color:
+      return mask
+  
+  # changed __createMask from source (https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly)
+  # to create custom masks for annotations
   def __createMask(self, img):
-    ## Prepare masking matrix
-    mask = np.full((224,224,3), 1.000, np.float16) ## White background
-    print(image.shape)
-    for x in range(image.shape[0]):
-      for y in range(image.shape[1]):
-        for z in range(image.shape[2]):
-          if (image[x][y][z]  == 1.000) or (image[x][y][z]  == 0.000):
-            mask[x][y] = [0.000,0.000,0.000]
-    ## Mask the image
-    masked_image = image.copy()
+    mask = detectColor(img)
+    if mask != None:
+      return mask
+    else:
+      mask = np.full((224,224,3), 255, np.float32)
+      for x in range(img.shape[0]):
+        for y in range(img.shape[1]):
+          b_or_w = True
+          for z in range(img.shape[2]):
+            if img[x][y][z] > 0 and img[x][y][z] < 230:
+              b_or_w = False
+          if b_or_w:
+            mask[x][y] = [0,0,0]
+
+    masked_image = img.copy()
     masked_image[mask==0] = 1.000
     return masked_image, mask
     
 
-PATH = '/data/jedrzej/medical/covid_dataset/'
+PATH = "./3_class_data"
 
-# get all of the training CXRs and labels
-train = tf.keras.preprocessing.image_dataset_from_directory(
+# get all of the CXRs and labels
+data = tf.keras.preprocessing.image_dataset_from_directory(
     PATH,
     color_mode = 'rgb',
-    validation_split=0.2,
-    subset="training",
-    seed=123,
     image_size=(224, 224),
     batch_size=10)
 
-# extracts training CXRs
-x_train = np.concatenate([x for x, y in train], axis=0)
-# extracts training labels
-y_train = np.concatenate([y for x, y in train], axis=0)
+# extracts CXRs
+x = np.concatenate([x for x, y in train], axis=0)
+# extracts labels
+y = np.concatenate([y for x, y in train], axis=0)
 
-traingen = createAugment(x_train, x_train)
+# get masks for all annotated images
+datagen = createAugment(x_train, x_train)
 
 ###########
 ## MODEL ##
 ###########
 
+# Ref: https://github.com/ayulockin/deepimageinpainting/blob/master/Image_Inpainting_Partial_Convolution.ipynb
 class InpaintingModel:
   '''
   Build UNET like model for image inpainting task.
@@ -326,12 +352,12 @@ def conv_output_length(input_length, filter_size,
 
 # load model from weights and architecture files
 model = InpaintingModel().prepare_model()
-model.load_weights('./inpainting_model_12321.h5')
+model.load_weights('./inpainting_model.h5')
 
 # test model on a file and create a file with output
 rows = 10
 sample_idx = 54
-[masked_images, masks], sample_labels = traingen[sample_idx]
+[masked_images, masks], sample_labels = datagen[sample_idx]
 
 fig, axs = plt.subplots(nrows=rows, ncols=4, figsize=(8, 2*rows))
 
@@ -349,6 +375,6 @@ for i in range(10):
 from datetime import datetime
 now = datetime.now()
 dt_string = now.strftime("%d/%m/%Y-%H:%M:%S")
-PATH = '/home/dirm/inpainting/results/custom-mask-' + dt_string + '-.png'
+PATH = './results/custom-mask-' + dt_string + '-.png'
 plt.savefig(PATH)
 plt.show()
