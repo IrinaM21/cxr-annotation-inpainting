@@ -88,7 +88,7 @@ class createAugment(keras.utils.Sequence):
 
     return masked_image, mask
 
-PATH = './data'
+PATH = './3_class_data'
 
 # get all of the training CXRs and labels
 train = tf.keras.preprocessing.image_dataset_from_directory(
