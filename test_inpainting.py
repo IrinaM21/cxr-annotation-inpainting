@@ -1,3 +1,5 @@
+# testing inpainting model from cxr_inpainting.py
+
 import keras
 import numpy as np
 import tensorflow as tf
@@ -61,10 +63,6 @@ class createAugment(keras.utils.Sequence):
       Mask_batch[i,] = mask / 255
       y_batch[i] = self.y[idx] / 255
 
-      # Masked_images[i,] = masked_image
-      # Mask_batch[i,] = mask
-      # y_batch[i] = self.y[idx]
-
     ## Return mask as well because partial convolution require the same.
     return [Masked_images, Mask_batch], y_batch
 
@@ -90,7 +88,7 @@ class createAugment(keras.utils.Sequence):
 
     return masked_image, mask
 
-PATH = '/data/jedrzej/medical/covid_dataset/'
+PATH = './data'
 
 # get all of the training CXRs and labels
 train = tf.keras.preprocessing.image_dataset_from_directory(
@@ -131,6 +129,7 @@ testgen = createAugment(x_test, x_test, shuffle=False)
 ## MODEL ##
 ###########
 
+# Ref: https://github.com/ayulockin/deepimageinpainting/blob/master/Image_Inpainting_Partial_Convolution.ipynb
 class InpaintingModel:
   '''
   Build UNET like model for image inpainting task.
@@ -351,17 +350,12 @@ def conv_output_length(input_length, filter_size,
 
 # load model from weights and architecture files
 model = InpaintingModel().prepare_model()
-model.load_weights('./inpainting_model_12321.h5')
+model.load_weights('./models/inpainting_model.h5')
 
 # test model on a file and create a file with output
 rows = 20
 sample_idx = 54
 [masked_images, masks], sample_labels = traingen[sample_idx]
-# casting everything to an int so the values aren't clipped to 0...1 later
-# masked_images = masked_images * 255
-# masked_images = masked_images.astype(int)
-# masks = masks.astype(int)
-# print(masked_images)
 
 fig, axs = plt.subplots(nrows=rows, ncols=4, figsize=(8, 2*rows))
 
@@ -373,12 +367,11 @@ for i in range(10):
   axs[i][0].imshow(masked_images[i])
   axs[i][1].imshow(masks[i])
   axs[i][2].imshow(impainted_image.reshape(impainted_image.shape[1:]))
-  # not casting to int anymore because the images are normalized now
   axs[i][3].imshow(sample_labels[i])
 
 # Generating a random number each time this file is created
 import random
 rand_num = random.randint(0, 1000)
-PATH = '/home/dirm/inpainting/results' + str(rand_num) + '.png'
+PATH = './results' + str(rand_num) + '.png'
 plt.savefig(PATH)
 plt.show()
