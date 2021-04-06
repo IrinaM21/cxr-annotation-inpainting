@@ -1,6 +1,10 @@
 # cxr-annotation-inpainting
 
-ML models used to detect COVID-19 from chest x-rays can use irrelevant features like annotations. This repository uses Pluralistic Image Inpainting to address this problem.
+ML models used to detect COVID-19 from chest x-rays can use irrelevant features like annotations. This repository addresses this problem using Pluralistic Image Inpainting.
+
+* test.py, train.py, /dataloader, /evaluations, /model, /options, /util: implement Pluralistic Image Inpainting. 
+* model_train_and_vis.ipynb, resnet_train.py: train, test, and validate a ResNet model that classifies chest x-rays as COVID, Healthy, or Viral Pneumonia. 
+* gradcam.py, saliencymaps.py: interpret the model's predictions with Grad-CAM and Guided Backprop.
 
 # Attribution
 
