@@ -21,4 +21,4 @@ Other files:
 
 The code from [https://github.com/lyndonzheng/Pluralistic-Inpainting](https://github.com/lyndonzheng/Pluralistic-Inpainting) is licensed under a [Creative Commons Attribution-NonCommercial 4.0 International License](https://creativecommons.org/licenses/by-nc/4.0/legalcode). 
 
-The code from [https://github.com/jacobgil/pytorch-grad-cam](https://github.com/jacobgil/pytorch-grad-cam) is licensed under an MIT license (see LICENSE file).
+The code from [https://github.com/jacobgil/pytorch-grad-cam](https://github.com/jacobgil/pytorch-grad-cam) is licensed under an MIT license (see LICENSE-pytorch-grad-cam file).
