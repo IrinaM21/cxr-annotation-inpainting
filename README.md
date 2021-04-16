@@ -14,6 +14,7 @@ Modifications:
 * Adding a 80/20 train/test split to data_loader.py
 * Updating base_options.py and data_loader.py to add a fourth mask option (detects and masks annotations on CXR)
 * Implementing the fourth mask option in task.py (has_color(), custom_helper(), annotation_mask())
+* Making pluralistic_model.py compatible with python 3.7
 
 Other files:
 * model_train_and_vis.ipynb is the original Colab used to run some experiments for "Using Grad-CAM to Improve Model Interpretability for COVID-19 and Viral Pneumonia Diagnosis from Chest X-ray Scans" by Irina Malyugina, Reha Matai, and Debanshi Misra. The training, testing, and validation code is written by Irina Malyugina. The Guided Grad-CAM code is from this repo: [https://github.com/jacobgil/pytorch-grad-cam](https://github.com/jacobgil/pytorch-grad-cam). The saliency maps code is written by Irina Malyugina using this toolkit: [https://github.com/MisaOgura/flashtorch](https://github.com/MisaOgura/flashtorch).
