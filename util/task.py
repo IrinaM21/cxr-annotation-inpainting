@@ -101,6 +101,7 @@ def custom_helper(o, i, s):
         for y in range(s[1]):
             rgb = o[x][y]
             if has_color(rgb):
+                print("masking")
                 i[x][y] = [1,1,1]
     return i
             
