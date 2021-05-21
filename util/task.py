@@ -97,12 +97,15 @@ def has_color(pixel):
 
 # mask all pixels with color
 def custom_helper(o, i, s):
+    clr = False
     for x in range(s[0]):
         for y in range(s[1]):
             rgb = o[x][y]
             if has_color(rgb):
+                clr = True
                 print("masking")
                 i[x][y] = [1,1,1]
+    assert clr
     return i
             
 # mask annotations on the CXR
