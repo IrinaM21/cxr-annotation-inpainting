@@ -104,7 +104,7 @@ def custom_helper(o, i, s):
             if has_color(rgb):
                 clr = True
                 print("masking")
-                i[x][y] = [1,1,1]
+                i[x][y] = [1]
     assert clr
     return i
             
