@@ -93,7 +93,7 @@ def has_color(pixel):
     diff3 = abs(pixel[2] - pixel[0])
     # if the difference between r, b, and g is more than 4,
     # the pixel has color
-    return max(diff1, diff2, diff3, 4) > 4
+    return max(diff1, diff2, diff3, .004) > .004
 
 # mask all pixels with color
 def custom_helper(o, i, s):
