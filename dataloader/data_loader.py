@@ -1,5 +1,6 @@
 from PIL import Image, ImageFile
 import torchvision.transforms as transforms
+import torch
 import torch.utils.data as data
 from .image_folder import make_dataset
 from util import task
@@ -41,6 +42,8 @@ class CreateDataset(data.Dataset):
         img_path = self.img_paths[index % self.img_size]
         img_pil = Image.open(img_path).convert('RGB')
         img = self.transform(img_pil)
+        print(img.size())
+        torch.set_printoptions(edgeitems=3)
         img_pil.close()
         return img, img_path
 
