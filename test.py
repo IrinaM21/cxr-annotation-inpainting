@@ -9,8 +9,8 @@ if __name__=='__main__':
     opt = test_options.TestOptions().parse()
     # creat a dataset
     dataset = data_loader.dataloader(opt)
-    # dataset_size = len(dataset) * opt.batchSize
-    dataset_size = len(dataset)
+    dataset_size = len(dataset) * opt.batchSize
+    # dataset_size = len(dataset)
     print('testing images = %d' % dataset_size)
     # create a model
     model = create_model(opt)
@@ -20,6 +20,7 @@ if __name__=='__main__':
     # create a visualizer
     visualizer = visualizer.Visualizer(opt)
     print("starting evaluation")
-    for i, data in enumerate(islice(dataset, opt.how_many)):
+    # for i, data in enumerate(islice(dataset, opt.how_many)):
+    for i, data in enumerate(dataset):
         model.set_input(data)
         model.test()
