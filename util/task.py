@@ -118,7 +118,7 @@ def annotation_mask(img):
     
     img = custom_helper(original, img, size)
 
-    img = img.reshape(size[2], size[1])
+    img = img.reshape(size[2], size[1], 3)
     img = Image.fromarray(img*255)
 
     img_mask = transform(img)
