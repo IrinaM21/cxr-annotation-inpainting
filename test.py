@@ -9,7 +9,8 @@ if __name__=='__main__':
     opt = test_options.TestOptions().parse()
     # creat a dataset
     dataset = data_loader.dataloader(opt)
-    dataset_size = len(dataset) * opt.batchSize
+    # dataset_size = len(dataset) * opt.batchSize
+    dataset_size = len(dataset)
     print('testing images = %d' % dataset_size)
     # create a model
     model = create_model(opt)
