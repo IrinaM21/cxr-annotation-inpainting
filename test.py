@@ -22,6 +22,6 @@ if __name__=='__main__':
     print("starting evaluation")
     # for i, data in enumerate(islice(dataset, opt.how_many)):
     for i, data in enumerate(dataset):
-        print(data)
+        print(data.size())
         model.set_input(data)
         model.test()
