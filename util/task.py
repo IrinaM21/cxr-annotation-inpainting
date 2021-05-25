@@ -103,7 +103,6 @@ def custom_helper(o, i, s):
             rgb = o[x][y]
             if has_color(rgb):
                 clr = True
-                print("masking")
                 i[x][y] = [1,1,1]
     assert clr
     return i
@@ -118,10 +117,12 @@ def annotation_mask(img):
     
     img = custom_helper(original, img, size)
 
-    img = img.reshape(size[2], size[1], 3)
+    img = np.swapaxes(img, 0, 2)
+    img = np.swapaxes(img, 1, 2)
     img = Image.fromarray(img*255)
 
     img_mask = transform(img)
+    print(img_mask)
     for j in range(size[0]):
         mask[j, :, :] = img_mask[j] < 1
 
