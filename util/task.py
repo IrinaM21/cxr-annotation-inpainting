@@ -104,7 +104,7 @@ def custom_helper(o, i, s):
             if has_color(rgb):
                 clr = True
                 print("masking")
-                i[x][y] = [1]
+                i[x][y] = [1,1,1]
     assert clr
     return i
             
@@ -114,7 +114,7 @@ def annotation_mask(img):
     transform = transforms.Compose([transforms.ToTensor()])
     mask = torch.ones_like(img)
     size = img.size()
-    img = np.zeros((size[1], size[2], 1), np.uint8)
+    img = np.zeros((size[1], size[2], 3), np.uint8)
     
     img = custom_helper(original, img, size)
 
