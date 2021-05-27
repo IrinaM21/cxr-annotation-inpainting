@@ -118,10 +118,13 @@ def annotation_mask(img):
     img = np.zeros((size[1], size[2], 3), np.uint8)
     
     img = custom_helper(original, img, size)
-
+    print("size again: ")
+    print(size)
     img = np.swapaxes(img, 0, 2)
     img = np.swapaxes(img, 1, 2)
-    img = Image.fromarray((255*img.permute(1, 2, 0)))
+    print("size again again: ")
+    print(size)
+    img = Image.fromarray((255*img).astype(np.uint8))
 
     img_mask = transform(img)
     print(img_mask)
