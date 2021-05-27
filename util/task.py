@@ -121,7 +121,7 @@ def annotation_mask(img):
 
     img = np.swapaxes(img, 0, 2)
     img = np.swapaxes(img, 1, 2)
-    img = Image.fromarray(img*255)
+    img = Image.fromarray((255*img.permute(1, 2, 0)))
 
     img_mask = transform(img)
     print(img_mask)
