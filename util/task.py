@@ -113,22 +113,20 @@ def annotation_mask(img):
     transform = transforms.Compose([transforms.ToTensor()])
     mask = torch.ones_like(img)
     size = img.size()
-    print("size: ")
-    print(size)
     img = np.zeros((size[1], size[2], 3), np.uint8)
     
     img = custom_helper(original, img, size)
-    print("size again: ")
-    print(img.shape)
     img = Image.fromarray((255*img).astype(np.uint8))
     print(img)
     img_mask = transform(img)
     print(img_mask)
-    
+
+    print(size[0])
+	
     for j in range(size[0]):
-	    for k in range(size[1]):
-		    for l in range(size[2]):
-			    mask[j][k][l] = img_mask[j][k][l] < 1
+	for k in range(size[1]):
+	    for l in range(size[2]):
+		mask[j][k][l] = img_mask[j][k][l] < 1
 
     return mask
 
