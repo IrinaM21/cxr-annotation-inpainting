@@ -116,8 +116,9 @@ def annotation_mask(img):
     img = np.zeros((size[1], size[2], 3), np.uint8)
     
     img = custom_helper(original, img, size)
-    img = Image.fromarray((255*img).astype(np.uint8))
     print(img)
+    img = Image.fromarray((255*img).astype(np.uint8))
+    
     img_mask = transform(img)
     print(img_mask)
 
