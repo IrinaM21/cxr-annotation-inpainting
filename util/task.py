@@ -125,8 +125,8 @@ def annotation_mask(img):
 	
     for j in range(size[0]):
         for k in range(size[1]):
-	    for l in range(size[2]):
-		mask[j][k][l] = img_mask[j][k][l] < 1
+            for l in range(size[2]):
+                mask[j][k][l] = img_mask[j][k][l] < 1
 
     return mask
 
