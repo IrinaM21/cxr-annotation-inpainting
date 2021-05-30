@@ -110,19 +110,19 @@ def custom_helper(o, i, s):
 # mask annotations on the CXR
 def annotation_mask(img):
     original = img
+    print("original")
+    print(original)
     transform = transforms.Compose([transforms.ToTensor()])
     mask = torch.ones_like(img)
     size = img.size()
     img = np.zeros((size[1], size[2], 3), np.uint8)
+    print("original again")
+    print(original)
     
     img = custom_helper(original, img, size)
-    print(img)
     img = Image.fromarray((255*img).astype(np.uint8))
     
     img_mask = transform(img)
-    print(img_mask)
-
-    print(size[0])
 	
     for j in range(size[0]):
         for k in range(size[1]):
