@@ -89,8 +89,11 @@ def random_irregular_mask(img):
 # determine if pixel has color
 def has_color(pixel):
     diff1 = abs(pixel[0] - pixel[1])
+    print(diff1)
     diff2 = abs(pixel[1] - pixel[2])
+    print(diff2)
     diff3 = abs(pixel[2] - pixel[0])
+    print(diff3)
     # if the difference between r, b, and g is more than 0,
     # the pixel has color
     return max(diff1, diff2, diff3, 0) > 0
@@ -117,6 +120,8 @@ def annotation_mask(img):
 
     original = torch.moveaxis(original, 1, 0)
     original = torch.moveaxis(original, 2, 1)
+    print(original.size())
+    print(original)
     img = custom_helper(original, img, size)
     img = Image.fromarray((255*img).astype(np.uint8))
     
