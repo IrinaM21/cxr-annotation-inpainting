@@ -120,9 +120,7 @@ def annotation_mask(img):
 
     original = torch.moveaxis(original, 1, 0)
     original = torch.moveaxis(original, 2, 1)
-    print(original.size())
-    print(original)
-    img = custom_helper(original, img, size)
+    img = custom_helper(original, img, original.size())
     img = Image.fromarray((255*img).astype(np.uint8))
     
     img_mask = transform(img)
