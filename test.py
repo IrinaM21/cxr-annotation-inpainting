@@ -12,16 +12,17 @@ if __name__=='__main__':
     dataset_size = len(dataset) * opt.batchSize
     # dataset_size = len(dataset)
     print('testing images = %d' % dataset_size)
+    print(len(dataset_size))
     # create a model
-    model = create_model(opt)
-    print("created model")
-    model.eval()
-    print("prepared model for evaluation")
+    # model = create_model(opt)
+    # print("created model")
+    # model.eval()
+    # print("prepared model for evaluation")
     # create a visualizer
-    visualizer = visualizer.Visualizer(opt)
-    print("starting evaluation")
+    # visualizer = visualizer.Visualizer(opt)
+    # print("starting evaluation")
     # for i, data in enumerate(islice(dataset, opt.how_many)):
-    for i, data in enumerate(dataset):
-        print(data["img"].size())
-        model.set_input(data)
-        model.test()
+    # for i, data in enumerate(dataset):
+    #     print(data["img"].size())
+    #     model.set_input(data)
+    #     model.test()
