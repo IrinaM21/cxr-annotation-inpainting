@@ -12,7 +12,7 @@ if __name__=='__main__':
     dataset_size = len(dataset) * opt.batchSize
     # dataset_size = len(dataset)
     print('testing images = %d' % dataset_size)
-    print(len(dataset_size))
+    print(len(dataset))
     # create a model
     # model = create_model(opt)
     # print("created model")
