@@ -13,11 +13,11 @@ class CreateDataset(data.Dataset):
         self.img_paths, self.img_size = make_dataset(opt.img_file)
         # add because cxr dataset not split by train and test
         # uses first 80% of images for training, last 20% for testing
-        split = int(0.8 * self.img_size)
-        if opt.isTrain:
-            self.img_paths = self.img_paths[:split]
-        else:
-            self.img_paths = self.img_paths[split:]
+        # split = int(0.8 * self.img_size)
+        # if opt.isTrain:
+        #     self.img_paths = self.img_paths[:split]
+        # else:
+        #     self.img_paths = self.img_paths[split:]
         self.img_size = len(self.img_paths)
         # provides random file for training and testing
         if opt.mask_file != 'none':
