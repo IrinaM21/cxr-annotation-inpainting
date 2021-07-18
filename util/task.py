@@ -107,7 +107,8 @@ def custom_helper(o, i, s):
             if has_color(rgb):
                 clr = True
                 i[x][y] = [1,1,1]
-    assert clr
+    # assert clr
+    print(clr)
     return i
             
 # mask annotations on the CXR
