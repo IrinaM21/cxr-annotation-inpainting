@@ -139,6 +139,7 @@ def annotation_mask(img):
 
 
 def scale_img(img, size):
+    print(img.size())
     scaled_img = F.interpolate(img, size=size, mode='bilinear', align_corners=True)
     return scaled_img
 
